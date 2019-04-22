@@ -9,7 +9,7 @@ With a working GO env:
 
     go get github.com/karampok/i3-bar
 
-Fonts/icons from fonts dir to ~/.{fonts,icons}
+Fonts/icons from dir of `~/.{fonts,icons}`
 
 # Usage
 
@@ -18,7 +18,7 @@ in ~/.config/i3/config:
 ```
 bar {
   position top
-  status_command exec $GOPATH/bin/i3-bar
+  status_command exec ${HOME}/bin/i3-bar
   font xft:Sans 11
 }
 ```

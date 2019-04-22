@@ -1,5 +1,5 @@
 build:
-	go build -o ~/bin/i3-bar i3-bar.go
+	go build -o ~/bin/i3-bar main.go
 
 try: build
 	i3-msg restart
