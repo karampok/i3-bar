@@ -45,11 +45,11 @@ func init() {
 // Clock ...
 func Clock(now time.Time) bar.Output {
 	return outputs.Pango(
-		pango.Icon("material-today").Color(colors.Scheme("dim-icon")),
-		pango.Icon("material-access-time").Color(colors.Scheme("dim-icon")),
+		pango.Icon("material-today"),
+		pango.Icon("material-access-time"),
 		now.Format("Mon 2 Jan "),
 		now.Format("15:04:05"),
-	).OnClick(click.RunLeft("gsimplecal"))
+	).OnClick(click.RunLeft("gsimplecal")).Color(colors.Scheme("dim-icon"))
 }
 
 // Bat ...
@@ -74,29 +74,28 @@ func Bat(i battery.Info) bar.Output {
 		out.Color(colors.Scheme("bad"))
 	case i.RemainingPct() <= 30:
 		out.Color(colors.Scheme("degraded"))
+	default:
+		out.Color(colors.Scheme("dim-icon"))
 	}
 	return out
 }
 
 // Snd ...
 func Snd(v volume.Volume) bar.Output {
-	iconName := "mute"
+	cl := colors.Scheme("dim-icon")
+	ic := pango.Icon("material-volume-down")
 	pct := v.Pct()
-	if v.Mute {
-		return outputs.
-			Pango(pango.Icon("material-volume-off"), spacer, pango.Textf("%2d%%", pct)).
-			Color(colors.Scheme("degraded"))
-	}
 	if pct > 66 {
-		iconName = "up"
-	} else if pct > 33 {
-		iconName = "down"
+		ic = pango.Icon("material-volume-up")
+		cl = colors.Scheme("degraded")
 	}
-	return outputs.Pango(
-		pango.Icon("material-volume-"+iconName),
-		spacer,
-		pango.Textf("%2d%%", pct),
-	)
+	if v.Mute {
+		ic = pango.Icon("material-volume-off")
+		cl = colors.Scheme("dim-icon")
+	}
+
+	return outputs.
+		Pango(ic, spacer, pango.Textf("%2d%%", pct)).Color(cl)
 }
 
 // Brightness ...
@@ -126,35 +125,44 @@ func Layout(m *kbdlayout.Module, i kbdlayout.Info) bar.Output {
 
 // Net ...
 func Net(s netinfo.State) bar.Output {
-	if len(s.IPs) < 1 {
-		return outputs.Text("No network").Color(colors.Scheme("bad"))
+	disp := pango.Text("no network")
+	cl := colors.Scheme("bad")
+	ic := pango.Icon("material-settings-ethernet")
+
+	if len(s.IPs) >= 1 {
+		disp = pango.Textf(fmt.Sprintf("%s:%v", s.Name, s.IPs[0]))
+		cl = colors.Scheme("dim-icon")
 	}
 	return outputs.
-		Pango(pango.Icon("material-settings-ethernet"), spacer, fmt.Sprintf("%s:%v", s.Name, s.IPs[0]))
+		Pango(ic, spacer, disp).Color(cl)
 }
 
 // Yubi ...
 func Yubi(x bool, y bool) bar.Output {
 	if x {
-		return outputs.Textf("GPG").Background(colors.Scheme("bad"))
+		return outputs.Textf("g").Background(colors.Scheme("dim-icon")).MinWidth(200)
 	}
 	if y {
-		return outputs.Textf("       ").Background(colors.Scheme("bad"))
+		return outputs.Textf("s").Background(colors.Scheme("dim-icon")).MinWidth(200)
 	}
 	return nil
 }
 
 // WLAN ...
 func WLAN(i wlan.Info) bar.Output {
+	disp := pango.Textf(fmt.Sprintf("%s", i.SSID))
+	cl := colors.Scheme("dim-icon")
+	ic := pango.Icon("material-signal-wifi-4-bar")
+
 	switch {
 	case !i.Enabled():
 		return nil
 	case i.Connecting():
 		return outputs.Text("W: ...")
 	case !i.Connected():
-		return outputs.Text("W: down")
-	default:
-		return outputs.
-			Pango(pango.Icon("material-signal-wifi-4-bar"), spacer, fmt.Sprintf("%s", i.SSID))
+		return outputs.Text("W: down").Color(colors.Scheme("degraded"))
 	}
+
+	return outputs.
+		Pango(ic, spacer, disp).Color(cl)
 }
