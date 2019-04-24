@@ -12,13 +12,14 @@ import (
 
 	"github.com/glebtv/custom_barista/kbdlayout"
 	"github.com/karampok/i3-bar/blocks"
+	"github.com/karampok/i3-bar/xbacklight"
 	"github.com/karampok/i3-bar/yubikey"
 )
 
 func main() {
 	yu := yubikey.New().Output(blocks.Yubi)
 	ly := kbdlayout.New().Output(blocks.Layout)
-	br := blocks.Xblight
+	br := xbacklight.New().Output(blocks.Brightness)
 	snd := volume.DefaultMixer().Output(blocks.Snd)
 	bat := battery.All().Output(blocks.Bat)
 	wi := wlan.Named("wifi").Output(blocks.WLAN)

@@ -5,7 +5,6 @@ import (
 	"os/exec"
 	"os/user"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"time"
 
@@ -14,7 +13,6 @@ import (
 	"barista.run/colors"
 	"barista.run/modules/battery"
 	"barista.run/modules/netinfo"
-	"barista.run/modules/shell"
 	"barista.run/modules/volume"
 	"barista.run/modules/wlan"
 	"barista.run/outputs"
@@ -42,12 +40,6 @@ func init() {
 	})
 
 	material.Load(home(".icons/material-design-icons"))
-	//	material.Load(home(".icons/material-design-icons"))
-	// mdi.Load(home("~/.icons/MaterialDesign-Webfont"))
-	// typicons.Load(home("~/.icons/typicons.font"))
-	//	ionicons.LoadMd(home("~/.icons/ionicons"))
-	// fontawesome.Load(home("~/.icons/Font-Awesome"))
-
 }
 
 // Clock ...
@@ -107,17 +99,17 @@ func Snd(v volume.Volume) bar.Output {
 	)
 }
 
-// Xblight ...
-var Xblight = shell.New("xbacklight").
-	Every(time.Second).
-	Output(func(s string) bar.Output {
-		i, err := strconv.ParseFloat(s, 64)
-		if err != nil {
-			return outputs.Textf("%s", s)
-		}
-		return outputs.
-			Pango(pango.Icon("material-brightness-medium"), spacer, fmt.Sprintf("%2.0f%%", i))
-	})
+// Brightness ...
+func Brightness(i int) bar.Output {
+	cl := colors.Scheme("dim-icon")
+	ic := pango.Icon("material-brightness-medium")
+	if i > 50 {
+		cl = colors.Scheme("degraded")
+		ic = pango.Icon("material-brightness-high")
+	}
+	return outputs.
+		Pango(ic, spacer, fmt.Sprintf("%2.0d%%", i)).Color(cl)
+}
 
 // Layout ...
 func Layout(m *kbdlayout.Module, i kbdlayout.Info) bar.Output {
