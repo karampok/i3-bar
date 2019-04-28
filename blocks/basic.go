@@ -12,6 +12,7 @@ import (
 	"barista.run/base/click"
 	"barista.run/colors"
 	"barista.run/modules/battery"
+	"barista.run/modules/bluetooth"
 	"barista.run/modules/netinfo"
 	"barista.run/modules/volume"
 	"barista.run/modules/wlan"
@@ -166,3 +167,30 @@ func WLAN(i wlan.Info) bar.Output {
 	return outputs.
 		Pango(ic, spacer, disp).Color(cl)
 }
+
+// Blue ...
+func Blue(i bluetooth.DeviceInfo) bar.Output {
+	dp := pango.Textf(fmt.Sprintf("%s", i.Alias))
+	cl := colors.Scheme("good")
+	ic := pango.Icon("material-bluetooth-connected")
+
+	if !i.Connected {
+		return nil
+	}
+	return outputs.
+		Pango(ic, spacer, dp).Color(cl)
+}
+
+// Snd2 ...
+// func Snd2(v volume.Volume) bar.Output {
+// 	cl := colors.Scheme("good")
+// 	ic := pango.Icon("material-volume-up")
+// 	pct := v.Pct()
+// 	if v.Mute {
+// 		ic = pango.Icon("material-volume-off")
+// 		cl = colors.Scheme("bad")
+// 	}
+
+// 	return outputs.
+// 		Pango(ic, spacer, pango.Textf("%2d%%", pct)).Color(cl)
+// }
