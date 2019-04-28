@@ -7,6 +7,7 @@ import (
 	"barista.run/modules/battery"
 	"barista.run/modules/bluetooth"
 	"barista.run/modules/clock"
+	"barista.run/modules/funcs"
 	"barista.run/modules/netinfo"
 	"barista.run/modules/volume"
 	"barista.run/modules/wlan"
@@ -28,11 +29,12 @@ func main() {
 	ti := clock.Local().Output(time.Second, blocks.Clock)
 
 	adapter, mac, _ := "hci0", "09:A5:C1:A6:5C:77", "bluez_sink.09_A5_C1_A6_5C_77.headset_head_unit"
-	bl := bluetooth.Device(adapter, mac).Output(blocks.Blue)
-	//snd2 := volume.Sink(sink).Output(blocks.Snd2)
+	//snd2 := volume.Sink(_).Output(blocks.Snd2)
+	blD := bluetooth.Device(adapter, mac).Output(blocks.Blue)
+	bl := funcs.Every(time.Second, blocks.Bluetooth)
 
 	panic(barista.Run(
-		yu, ly, br, snd, bat, wi, nt, bl, ti,
+		yu, blD, ly, br, snd, bat, wi, nt, bl, ti,
 	))
 
 }

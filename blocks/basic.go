@@ -2,6 +2,7 @@ package blocks
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os/exec"
 	"os/user"
 	"path/filepath"
@@ -166,6 +167,22 @@ func WLAN(i wlan.Info) bar.Output {
 
 	return outputs.
 		Pango(ic, spacer, disp).Color(cl)
+}
+
+// Bluetooth ...
+func Bluetooth(s bar.Sink) {
+	cl := colors.Scheme("degraded")
+	ic := pango.Icon("material-bluetooth")
+
+	f := func(p string) string {
+		vv, _ := ioutil.ReadFile(p)
+		return strings.TrimSpace(string(vv))
+	}
+	v := f("/sys/devices/platform/thinkpad_acpi/bluetooth_enable")
+	if v == string("0") {
+		cl = colors.Scheme("dim-icon")
+	}
+	s.Output(outputs.Pango(ic).Color(cl))
 }
 
 // Blue ...
