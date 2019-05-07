@@ -2,7 +2,6 @@ package blocks
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os/exec"
 	"os/user"
 	"path/filepath"
@@ -11,6 +10,7 @@ import (
 
 	"barista.run/bar"
 	"barista.run/base/click"
+	"barista.run/base/watchers/netlink"
 	"barista.run/colors"
 	"barista.run/modules/battery"
 	"barista.run/modules/bluetooth"
@@ -21,6 +21,7 @@ import (
 	"barista.run/pango"
 	"barista.run/pango/icons/material"
 	"github.com/glebtv/custom_barista/kbdlayout"
+	"github.com/muka/go-bluetooth/api"
 )
 
 var spacer = pango.Text("   ").XXSmall()
@@ -56,13 +57,14 @@ func Clock(now time.Time) bar.Output {
 
 // Bat ...
 func Bat(i battery.Info) bar.Output {
-	disp := pango.Textf("Bat: %d%%", i.RemainingPct())
+	disp := pango.Textf("Bat: %d%% (%2.1f Watt)", i.RemainingPct(), i.Power)
 	if i.Status == battery.Disconnected || i.Status == battery.Unknown {
 		return nil
 	}
 	iconName := "material-battery-std"
 	icon := pango.Icon(iconName).Color(colors.Scheme("dim-icon"))
 	if i.Status == battery.Charging {
+		disp = pango.Textf("Bat: %d%%", i.RemainingPct())
 		iconName = "material-battery-charging-full"
 		icon = pango.Icon(iconName)
 	}
@@ -157,6 +159,9 @@ func WLAN(i wlan.Info) bar.Output {
 	ic := pango.Icon("material-signal-wifi-4-bar")
 
 	switch {
+	case i.State == netlink.Down:
+		disp = pango.Textf("down")
+		cl = colors.Scheme("degraded")
 	case !i.Enabled():
 		return nil
 	case i.Connecting():
@@ -174,12 +179,8 @@ func Bluetooth(s bar.Sink) {
 	cl := colors.Scheme("degraded")
 	ic := pango.Icon("material-bluetooth")
 
-	f := func(p string) string {
-		vv, _ := ioutil.ReadFile(p)
-		return strings.TrimSpace(string(vv))
-	}
-	v := f("/sys/devices/platform/thinkpad_acpi/bluetooth_enable")
-	if v == string("0") {
+	_, err := api.GetAdapterStatus("hci0")
+	if err != nil {
 		cl = colors.Scheme("dim-icon")
 	}
 	s.Output(outputs.Pango(ic).Color(cl))
