@@ -2,7 +2,6 @@ package blocks
 
 import (
 	"fmt"
-	"os/exec"
 	"os/user"
 	"path/filepath"
 	"strings"
@@ -21,7 +20,6 @@ import (
 	"barista.run/pango"
 	"barista.run/pango/icons/material"
 	"github.com/glebtv/custom_barista/kbdlayout"
-	"github.com/muka/go-bluetooth/api"
 )
 
 var spacer = pango.Text("   ").XXSmall()
@@ -57,31 +55,31 @@ func Clock(now time.Time) bar.Output {
 
 // Bat ...
 func Bat(i battery.Info) bar.Output {
-	disp := pango.Textf("Bat: %d%% (%2.1f Watt)", i.RemainingPct(), i.Power)
 	if i.Status == battery.Disconnected || i.Status == battery.Unknown {
-		return nil
+		return outputs.Textf("%v", i.Status).Urgent(true)
 	}
+
+	disp := pango.Textf("Bat: %d%% (%2.1f Watt)", i.RemainingPct(), i.Power)
 	iconName := "material-battery-std"
 	icon := pango.Icon(iconName).Color(colors.Scheme("dim-icon"))
+	cl := colors.Scheme("dim-icon")
+
 	if i.Status == battery.Charging {
 		disp = pango.Textf("Bat: %d%%", i.RemainingPct())
 		iconName = "material-battery-charging-full"
 		icon = pango.Icon(iconName)
 	}
-	out := outputs.Pango(icon, disp)
+
+	var urgent bool
 	switch {
 	case i.RemainingPct() <= 10:
-		exec.Command("notify-send", "-t", "2000", "battery", "very low", "-u", "critical").Run()
-		out.Urgent(true)
+		urgent = true
 	case i.RemainingPct() <= 20:
-		exec.Command("notify-send", "-t", "2000", "battery", "low", "-u", "normal").Run()
-		out.Color(colors.Scheme("bad"))
+		cl = colors.Scheme("bad")
 	case i.RemainingPct() <= 30:
-		out.Color(colors.Scheme("degraded"))
-	default:
-		out.Color(colors.Scheme("dim-icon"))
+		cl = colors.Scheme("degraded")
 	}
-	return out
+	return outputs.Pango(icon, disp).Color(cl).Urgent(urgent)
 }
 
 // Snd ...
@@ -136,9 +134,10 @@ func Net(s netinfo.State) bar.Output {
 	if len(s.IPs) >= 1 {
 		disp = pango.Textf(fmt.Sprintf("%s:%v", s.Name, s.IPs[0]))
 		cl = colors.Scheme("dim-icon")
+		return outputs.
+			Pango(ic, spacer, disp).Color(cl)
 	}
-	return outputs.
-		Pango(ic, spacer, disp).Color(cl)
+	return nil
 }
 
 // Yubi ...
@@ -175,15 +174,15 @@ func WLAN(i wlan.Info) bar.Output {
 }
 
 // Bluetooth ...
-func Bluetooth(s bar.Sink) {
+func Bluetooth(s bluetooth.AdapterInfo) bar.Output {
 	cl := colors.Scheme("degraded")
 	ic := pango.Icon("material-bluetooth")
 
-	_, err := api.GetAdapterStatus("hci0")
-	if err != nil {
+	if !s.Powered {
 		cl = colors.Scheme("dim-icon")
 	}
-	s.Output(outputs.Pango(ic).Color(cl))
+	return outputs.
+		Pango(ic).Color(cl)
 }
 
 // Blue ...
