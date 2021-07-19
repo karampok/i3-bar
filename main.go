@@ -38,5 +38,4 @@ func main() {
 		//blD, ly, br, snd, bat, wi, nt1, nt2, bl, ti,
 		blD, ly, br, snd, bat, wi, nt1, nt2, nt3, bl, ti,
 	))
-
 }
