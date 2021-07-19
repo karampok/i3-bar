@@ -20,7 +20,7 @@ type Module struct {
 }
 
 func (*Module) get() int {
-	b, err := exec.Command("xbacklight").CombinedOutput()
+	b, err := exec.Command("xbacklight", "-get").CombinedOutput()
 	if err != nil {
 		return -10
 	}
