@@ -1,7 +1,7 @@
 ## My i3-bar using Barista
 
-[barista](https://github.com/soumya92/barista) is i3status replacement in go.
-
+This is my bar optimized for Lenovo ThinkPad X1 Carbon (6th) running arch linux and for my needs.
+It is based on [barista](https://github.com/soumya92/barista).
 
 ## Installation
 
