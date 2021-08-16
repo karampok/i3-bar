@@ -13,7 +13,7 @@ import (
 )
 
 func GCal(evts calendar.EventList) bar.Output {
-	c := colors.Scheme("dim-icon")
+	cl := colors.Scheme("dim-icon")
 	ic := pango.Icon("material-today")
 
 	var e calendar.Event
@@ -23,9 +23,10 @@ func GCal(evts calendar.EventList) bar.Output {
 	case len(evts.Alerting) > 0:
 		e = evts.Alerting[0]
 	case len(evts.Upcoming) > 0:
+		cl = colors.Scheme("bad")
 		e = evts.Upcoming[0]
 	default:
-		return outputs.Pango(ic, "empty").Color(c)
+		return outputs.Pango(ic, "empty").Color(cl)
 	}
 	untilStart := e.UntilStart()
 	minus := ""
@@ -35,7 +36,7 @@ func GCal(evts calendar.EventList) bar.Output {
 	}
 	txt := strings.ToLower(e.Summary)
 	return outputs.Repeat(func(time.Time) bar.Output {
-		return outputs.Pango(ic, fmt.Sprintf("%s  %s%dh%dm", txt,
-			minus, int(untilStart.Hours()), int(untilStart.Minutes())%60)).Color(c)
+		return outputs.Pango(ic, spacer, fmt.Sprintf("%s (%v)(%v)  %s%dh%dm", txt, e.Response, e.EventStatus,
+			minus, int(untilStart.Hours()), int(untilStart.Minutes())%60), "           ").Color(cl)
 	}).Every(time.Minute)
 }
