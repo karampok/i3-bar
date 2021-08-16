@@ -140,6 +140,22 @@ func Net(s netinfo.State) bar.Output {
 	return nil
 }
 
+// PerVPN returns custom per vpn interface output function.
+func PerVPN(name string) func(s netinfo.State) bar.Output {
+	disp := pango.Text(name)
+	ret := func(s netinfo.State) bar.Output {
+		cl := colors.Scheme("dim-icon")
+		ic := pango.Icon("material-vpn-lock")
+
+		if len(s.IPs) >= 1 {
+			cl = colors.Scheme("good")
+		}
+		return outputs.
+			Pango(ic, spacer, disp).Color(cl)
+	}
+	return ret
+}
+
 // Yubi ...
 func Yubi(x bool, y bool) bar.Output {
 	if x {

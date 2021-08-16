@@ -19,16 +19,19 @@ func GCal(evts calendar.EventList) bar.Output {
 	var e calendar.Event
 	switch {
 	case len(evts.InProgress) > 0:
+		cl = colors.Scheme("bad")
 		e = evts.InProgress[0]
 	case len(evts.Alerting) > 0:
 		e = evts.Alerting[0]
 	case len(evts.Upcoming) > 0:
-		cl = colors.Scheme("bad")
 		e = evts.Upcoming[0]
 	default:
 		return outputs.Pango(ic, "empty").Color(cl)
 	}
 	untilStart := e.UntilStart()
+	if untilStart < time.Hour*1 {
+		cl = colors.Scheme("degraded")
+	}
 	minus := ""
 	if untilStart < 0 {
 		untilStart = -untilStart
