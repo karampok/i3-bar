@@ -8,6 +8,7 @@ import (
 	"barista.run/bar"
 	"barista.run/colors"
 	"barista.run/modules/gsuite/calendar"
+	"barista.run/modules/gsuite/gmail"
 	"barista.run/outputs"
 	"barista.run/pango"
 )
@@ -34,12 +35,24 @@ func GCal(evts calendar.EventList) bar.Output {
 	}
 	minus := ""
 	if untilStart < 0 {
+		cl = colors.Scheme("bad")
 		untilStart = -untilStart
 		minus = "-"
 	}
 	txt := strings.ToLower(e.Summary)
 	return outputs.Repeat(func(time.Time) bar.Output {
 		return outputs.Pango(ic, spacer, fmt.Sprintf("%s (%v)(%v)  %s%dh%dm", txt, e.Response, e.EventStatus,
-			minus, int(untilStart.Hours()), int(untilStart.Minutes())%60), "           ").Color(cl)
+			minus, int(untilStart.Hours()), int(untilStart.Minutes())%60), strings.Repeat(" ", 100)).Color(cl)
 	}).Every(time.Minute)
+}
+
+func GMail(n gmail.Info) bar.Output {
+	cl := colors.Scheme("dim-icon")
+	ic := pango.Icon("material-email")
+	v := n.Unread["INBOX"]
+	if v > 0 {
+		cl = colors.Scheme("degraded")
+	}
+
+	return outputs.Pango(ic, spacer, v).Color(cl)
 }

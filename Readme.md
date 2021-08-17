@@ -22,3 +22,8 @@ bar {
   font xft:Sans 11
 }
 ```
+
+
+# Notes
+
+In order gsuite to work enable the APIs in https://console.developers.google.com/apis/api/gmail.googleapis.com/overview

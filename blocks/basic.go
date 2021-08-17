@@ -20,6 +20,7 @@ import (
 	"barista.run/pango"
 	"barista.run/pango/icons/material"
 	"github.com/glebtv/custom_barista/kbdlayout"
+	"github.com/martinohmann/barista-contrib/modules/ip"
 )
 
 var spacer = pango.Text("   ").XXSmall()
@@ -43,10 +44,27 @@ func init() {
 	material.Load(home(".icons/material-design-icons"))
 }
 
+// Online ...
+func Online(info ip.Info) bar.Output {
+	cl := colors.Scheme("dim-icon")
+	disp := pango.Textf("online")
+	if !info.Connected() {
+		cl = colors.Scheme("bad")
+		disp = pango.Textf("offline")
+	}
+	return outputs.Pango(spacer, disp).Color(cl)
+}
+
+// ViaInterface ...
+func ViaInterface(intf string) bar.Output {
+	cl := colors.Scheme("dim-icon")
+	disp := pango.Textf("via %s", intf)
+	return outputs.Pango(spacer, disp).Color(cl)
+}
+
 // Clock ...
 func Clock(now time.Time) bar.Output {
 	return outputs.Pango(
-		pango.Icon("material-today"),
 		pango.Icon("material-access-time"),
 		now.Format("Mon 2 Jan "),
 		now.Format("15:04:05"),
@@ -191,11 +209,11 @@ func WLAN(i wlan.Info) bar.Output {
 
 // Bluetooth ...
 func Bluetooth(s bluetooth.AdapterInfo) bar.Output {
-	cl := colors.Scheme("degraded")
+	cl := colors.Scheme("dim-icon")
 	ic := pango.Icon("material-bluetooth")
 
 	if !s.Powered {
-		cl = colors.Scheme("dim-icon")
+		cl = colors.Scheme("degraded")
 	}
 	return outputs.
 		Pango(ic).Color(cl)

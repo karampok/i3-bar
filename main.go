@@ -10,12 +10,14 @@ import (
 	"barista.run/modules/bluetooth"
 	"barista.run/modules/clock"
 	"barista.run/modules/gsuite/calendar"
+	"barista.run/modules/gsuite/gmail"
 	"barista.run/modules/netinfo"
+	"barista.run/modules/shell"
 	"barista.run/modules/volume"
 	"barista.run/modules/volume/pulseaudio"
 	"barista.run/modules/wlan"
+
 	"barista.run/oauth"
-	"barista.run/outputs"
 	"github.com/glebtv/custom_barista/kbdlayout"
 	"github.com/karampok/i3-bar/blocks"
 	"github.com/karampok/i3-bar/module"
@@ -25,53 +27,43 @@ import (
 )
 
 func main() {
-	var cl bar.Module
-	if out, err := setupCalendarCreds(); err == nil {
+
+	//Gsuite stuff
+	var cl, gm bar.Module
+	if out, err := setupGSuiteCreds(); err == nil {
 		cl = calendar.New(out).Output(blocks.GCal).TimeWindow(8 * time.Hour)
+		gm = gmail.New(out, "INBOX").Output(blocks.GMail)
 	} else {
 		cl = module.NewDummyModule("calendar error")
 	}
 
-	// TODO: get one that does not crash on setup-auth
-	lly := kbdlayout.New().Output(blocks.Layout)
-	// ly := module.NewXkblayoutState("us", "gr").Output(func(l keyboard.Layout) bar.Output {
-	// 	return outputs.Textf("%s", strings.ToUpper(l.Name)).OnClick(func(e bar.Event) {
-	// 		switch e.Button {
-	// 		case bar.ButtonLeft:
-	// 			l.Next()
-	// 		case bar.ButtonRight:
-	// 			l.Previous()
-	// 		}
-	// 	})
-	// })
+	//System stuff
+	lly := kbdlayout.New().Output(blocks.Layout) // TODO: get one that does not crash on setup-auth
 	br := xbacklight.New().Output(blocks.Brightness)
 	snd := volume.New(pulseaudio.DefaultSink()).Output(blocks.Snd)
 	bat := battery.All().Output(blocks.Bat)
-	wi := wlan.Named("wifi").Output(blocks.WLAN)
-	// TODO: make this to print default route interface
-	gateway := ip.New(ipify.Provider).Output(func(info ip.Info) bar.Output {
-		if info.Connected() {
-			return outputs.Textf("online: %s", info.IP)
-		}
 
-		return outputs.Text("offline")
-	})
-	tvpn := netinfo.Interface("tailscale0").Output(blocks.PerVPN("TS"))
-	rvpn := netinfo.Interface("redhat0").Output(blocks.PerVPN("RH"))
-	ti := clock.Local().Output(time.Second, blocks.Clock)
-
-	//adapter, mac, _ := "hci0", "09:A5:C1:A6:5C:77", "bluez_sink.09_A5_C1_A6_5C_77.headset_head_unit"
+	//Bluetooth stuff
 	adapter, mac, _ := "hci0", "4C:87:5D:58:8B:C2", "bluez_sink.4C_87_5D_58_8B_C2.headset_head_unit"
-	//snd2 := volume.Sink(_).Output(blocks.Snd2)
 	blD := bluetooth.Device(adapter, mac).Output(blocks.Blue)
 	bl := bluetooth.DefaultAdapter().Output(blocks.Bluetooth)
 
+	//Net stuff
+	wi := wlan.Named("wifi").Output(blocks.WLAN)
+	tvpn := netinfo.Interface("tailscale0").Output(blocks.PerVPN("TS"))
+	rvpn := netinfo.Interface("redhat0").Output(blocks.PerVPN("RH"))
+	online := ip.New(ipify.Provider).Output(blocks.Online).Every(time.Minute)
+	via := shell.New("bash", "-c", "ip route get 8.8.8.8 | grep -Po '(?<=dev )(\\S+)'").
+		Output(blocks.ViaInterface).Every(time.Minute)
+
+	ti := clock.Local().Output(time.Second, blocks.Clock)
+
 	panic(barista.Run(
-		cl, blD, lly, br, snd, bat, wi, gateway, tvpn, rvpn, bl, ti,
+		gm, cl, lly, br, snd, bat, bl, blD, wi, tvpn, rvpn, online, via, ti,
 	))
 }
 
-func setupCalendarCreds() ([]byte, error) {
+func setupGSuiteCreds() ([]byte, error) {
 	fetch := func(path string) ([]byte, error) {
 		return exec.Command("gopass", "show", "-o", path).CombinedOutput()
 	}
@@ -80,7 +72,7 @@ func setupCalendarCreds() ([]byte, error) {
 		return masterKey, err
 	}
 	oauth.SetEncryptionKey(masterKey)
-	return fetch("services/rh-calendar")
+	return fetch("services/i3bar-rh-gsuite")
 	// return of type []byte(`{"installed": {
 	// 	"client_id":"%%GOOGLE_CLIENT_ID%%",
 	// 	"project_id":"i3-barista",

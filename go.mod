@@ -10,7 +10,6 @@ require (
 	github.com/martinlindhe/unit v0.0.0-20190604142932-3b6be53d49af
 	github.com/martinohmann/barista-contrib v0.0.0-20200512173359-33be425ccfe9
 	github.com/maximbaz/yubikey-touch-detector v0.0.0-20200421201032-8fba75527a0c
-	github.com/rogpeppe/gohack v1.0.2 // indirect
 	github.com/sirupsen/logrus v1.5.0 // indirect
 	github.com/zalando/go-keyring v0.0.0-20200121091418-667557018717
 	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9 // indirect
@@ -19,3 +18,5 @@ require (
 	golang.org/x/text v0.3.6 // indirect
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
 )
+
+
