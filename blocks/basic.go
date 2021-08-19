@@ -221,7 +221,7 @@ func Bluetooth(s bluetooth.AdapterInfo) bar.Output {
 
 // Blue ...
 func Blue(i bluetooth.DeviceInfo) bar.Output {
-	dp := pango.Textf(fmt.Sprintf("%s", i.Alias))
+	dp := pango.Textf(fmt.Sprintf("%v", i.Alias))
 	cl := colors.Scheme("good")
 	ic := pango.Icon("material-bluetooth-connected")
 

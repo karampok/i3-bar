@@ -16,25 +16,25 @@ import (
 	"barista.run/modules/volume"
 	"barista.run/modules/volume/pulseaudio"
 	"barista.run/modules/wlan"
-
 	"barista.run/oauth"
 	"github.com/glebtv/custom_barista/kbdlayout"
+	"github.com/martinohmann/barista-contrib/modules/ip"
+	"github.com/martinohmann/barista-contrib/modules/ip/ipify"
+
 	"github.com/karampok/i3-bar/blocks"
 	"github.com/karampok/i3-bar/module"
 	"github.com/karampok/i3-bar/xbacklight"
-	"github.com/martinohmann/barista-contrib/modules/ip"
-	"github.com/martinohmann/barista-contrib/modules/ip/ipify"
 )
 
 func main() {
-
-	//Gsuite stuff
+	//System stuff
 	var cl, gm bar.Module
 	if out, err := setupGSuiteCreds(); err == nil {
 		cl = calendar.New(out).Output(blocks.GCal).TimeWindow(8 * time.Hour)
 		gm = gmail.New(out, "INBOX").Output(blocks.GMail)
 	} else {
 		cl = module.NewDummyModule("calendar error")
+		gm = module.NewDummyModule("gmail error")
 	}
 
 	//System stuff
@@ -59,7 +59,7 @@ func main() {
 	ti := clock.Local().Output(time.Second, blocks.Clock)
 
 	panic(barista.Run(
-		gm, cl, lly, br, snd, bat, bl, blD, wi, tvpn, rvpn, online, via, ti,
+		cl, gm, lly, br, snd, bat, bl, blD, wi, tvpn, rvpn, online, via, ti,
 	))
 }
 

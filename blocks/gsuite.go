@@ -13,14 +13,25 @@ import (
 	"barista.run/pango"
 )
 
+func outsideWorkingHours() bool {
+	if h := time.Now().Hour(); h > 17 || h < 9 {
+		return true
+	}
+	return false
+}
+
 func GCal(evts calendar.EventList) bar.Output {
 	cl := colors.Scheme("dim-icon")
 	ic := pango.Icon("material-today")
+	urgent := false
+
+	if outsideWorkingHours() {
+		return nil
+	}
 
 	var e calendar.Event
 	switch {
 	case len(evts.InProgress) > 0:
-		cl = colors.Scheme("bad")
 		e = evts.InProgress[0]
 	case len(evts.Alerting) > 0:
 		e = evts.Alerting[0]
@@ -30,29 +41,36 @@ func GCal(evts calendar.EventList) bar.Output {
 		return outputs.Pango(ic, "empty").Color(cl)
 	}
 	untilStart := e.UntilStart()
-	if untilStart < time.Hour*1 {
+	if untilStart < 15*time.Minute {
 		cl = colors.Scheme("degraded")
 	}
 	minus := ""
 	if untilStart < 0 {
 		cl = colors.Scheme("bad")
+		urgent = true
 		untilStart = -untilStart
 		minus = "-"
 	}
 	txt := strings.ToLower(e.Summary)
 	return outputs.Repeat(func(time.Time) bar.Output {
-		return outputs.Pango(ic, spacer, fmt.Sprintf("%s (%v)(%v)  %s%dh%dm", txt, e.Response, e.EventStatus,
-			minus, int(untilStart.Hours()), int(untilStart.Minutes())%60), strings.Repeat(" ", 100)).Color(cl)
+		return outputs.Pango(ic, spacer, fmt.Sprintf("%s (%v)  %s%dh%dm", txt, e.Response,
+			minus, int(untilStart.Hours()), int(untilStart.Minutes())%60)).Color(cl).Urgent(urgent)
 	}).Every(time.Minute)
 }
 
 func GMail(n gmail.Info) bar.Output {
 	cl := colors.Scheme("dim-icon")
 	ic := pango.Icon("material-email")
-	v := n.Unread["INBOX"]
-	if v > 0 {
-		cl = colors.Scheme("degraded")
+	urgent := false
+
+	if outsideWorkingHours() {
+		return nil
 	}
 
-	return outputs.Pango(ic, spacer, v).Color(cl)
+	v := n.Unread["INBOX"]
+	if v > 0 {
+		urgent = true
+	}
+
+	return outputs.Pango(ic, spacer, v).Color(cl).Urgent(urgent)
 }
