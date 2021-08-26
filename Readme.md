@@ -23,7 +23,8 @@ bar {
 }
 ```
 
-
 # Notes
 
 In order gsuite to work enable the APIs in https://console.developers.google.com/apis/api/gmail.googleapis.com/overview
+
+https://github.com/jD91mZM2/xidlehook

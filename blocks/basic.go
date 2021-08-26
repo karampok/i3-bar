@@ -39,6 +39,9 @@ func init() {
 		"degraded": "#dd6",
 		"bad":      "#d66",
 		"dim-icon": "#777",
+		"dimmed":   "#777",
+		"black":    "#ffffff",
+		"white":    "#000000",
 	})
 
 	material.Load(home(".icons/material-design-icons"))
@@ -52,14 +55,14 @@ func Online(info ip.Info) bar.Output {
 		cl = colors.Scheme("bad")
 		disp = pango.Textf("offline")
 	}
-	return outputs.Pango(spacer, disp).Color(cl)
+	return outputs.Pango(disp).Color(cl)
 }
 
 // ViaInterface ...
 func ViaInterface(intf string) bar.Output {
 	cl := colors.Scheme("dim-icon")
 	disp := pango.Textf("via %s", intf)
-	return outputs.Pango(spacer, disp).Color(cl)
+	return outputs.Pango(disp).Color(cl)
 }
 
 // Clock ...
@@ -77,7 +80,7 @@ func Bat(i battery.Info) bar.Output {
 		return outputs.Textf("%v", i.Status).Urgent(true)
 	}
 
-	disp := pango.Textf("Bat: %d%% (%2.1f Watt)", i.RemainingPct(), i.Power)
+	disp := pango.Textf("%d%% (%2.1f Watt)", i.RemainingPct(), i.Power)
 	iconName := "material-battery-std"
 	icon := pango.Icon(iconName).Color(colors.Scheme("dim-icon"))
 	cl := colors.Scheme("dim-icon")
@@ -115,7 +118,7 @@ func Snd(v volume.Volume) bar.Output {
 	}
 
 	return outputs.
-		Pango(ic, spacer, pango.Textf("%2d%%", pct)).Color(cl)
+		Pango(ic, pango.Textf("%2d%%", pct)).Color(cl)
 }
 
 // Brightness ...
@@ -127,7 +130,7 @@ func Brightness(i int) bar.Output {
 		ic = pango.Icon("material-brightness-high")
 	}
 	return outputs.
-		Pango(ic, spacer, fmt.Sprintf("%2.0d%%", i)).Color(cl)
+		Pango(ic, fmt.Sprintf("%2.0d%%", i)).Color(cl)
 }
 
 // Layout ...
@@ -138,7 +141,7 @@ func Layout(m *kbdlayout.Module, i kbdlayout.Info) bar.Output {
 		c = colors.Scheme("degraded")
 	}
 	return outputs.Pango(
-		pango.Icon("material-language"), spacer,
+		pango.Icon("material-language"),
 		fmt.Sprintf("%s", la),
 	).OnClick(m.Click).Color(c)
 }
@@ -193,7 +196,7 @@ func WLAN(i wlan.Info) bar.Output {
 
 	switch {
 	case i.State == netlink.Down:
-		disp = pango.Textf("down")
+		disp = pango.Textf("")
 		cl = colors.Scheme("degraded")
 	case !i.Enabled():
 		return nil
@@ -204,7 +207,7 @@ func WLAN(i wlan.Info) bar.Output {
 	}
 
 	return outputs.
-		Pango(ic, spacer, disp).Color(cl)
+		Pango(ic, disp).Color(cl)
 }
 
 // Bluetooth ...
@@ -214,22 +217,25 @@ func Bluetooth(s bluetooth.AdapterInfo) bar.Output {
 
 	if !s.Powered {
 		cl = colors.Scheme("degraded")
+		return outputs.
+			Pango(ic).Color(cl)
 	}
-	return outputs.
-		Pango(ic).Color(cl)
+	return nil
 }
 
 // Blue ...
-func Blue(i bluetooth.DeviceInfo) bar.Output {
-	dp := pango.Textf(fmt.Sprintf("%v", i.Alias))
-	cl := colors.Scheme("good")
-	ic := pango.Icon("material-bluetooth-connected")
+func PerBlueDevice(alias string) func(bluetooth.DeviceInfo) bar.Output {
+	return func(i bluetooth.DeviceInfo) bar.Output {
+		dp := pango.Textf(fmt.Sprintf("%v", alias))
+		cl := colors.Scheme("good")
+		ic := pango.Icon("material-bluetooth-connected")
 
-	if !i.Connected {
-		return nil
+		if !i.Connected {
+			return nil
+		}
+		return outputs.
+			Pango(ic, dp).Color(cl)
 	}
-	return outputs.
-		Pango(ic, spacer, dp).Color(cl)
 }
 
 // Snd2 ...

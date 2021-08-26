@@ -45,7 +45,7 @@ func main() {
 
 	//Bluetooth stuff
 	adapter, mac, _ := "hci0", "4C:87:5D:58:8B:C2", "bluez_sink.4C_87_5D_58_8B_C2.headset_head_unit"
-	blD := bluetooth.Device(adapter, mac).Output(blocks.Blue)
+	blD := bluetooth.Device(adapter, mac).Output(blocks.PerBlueDevice("QC35"))
 	bl := bluetooth.DefaultAdapter().Output(blocks.Bluetooth)
 
 	//Net stuff
