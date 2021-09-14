@@ -44,7 +44,12 @@ func init() {
 		"white":    "#000000",
 	})
 
-	material.Load(home(".icons/material-design-icons"))
+	// if err:=	typicons.Load(home(".icon/typicons.font")); err!=nil{
+	// panic(err)
+	// }
+	if err := material.Load(home(".icons/material-design-icons")); err != nil {
+		panic(err)
+	}
 }
 
 // Online ...
@@ -58,8 +63,39 @@ func Online(info ip.Info) bar.Output {
 	return outputs.Pango(disp).Color(cl)
 }
 
+// Snd2 ...
+func Snd2(intf string) bar.Output {
+	space := pango.Text(" /  ").XXSmall()
+	out := new(pango.Node)
+
+	i, o := parsePulsemixer(intf)
+	out.Concat(i.PangoNode()).Concat(space)
+	out.Concat(o.PangoNode())
+	// cl := colors.Scheme("dim-icon")
+	// if i.mute{
+	// cl = colors.Scheme("bad")
+	// }
+	// disp := pango.Textf("input: %s| output: %s", i.alias, o.alias)
+	// return outputs.Pango(disp).Color(cl)
+	return out
+}
+
 // ViaInterface ...
 func ViaInterface(intf string) bar.Output {
+
+	// TODO just send via wire or wifi
+	// enp4s10f1                        pci 0000:04:0a.1
+	// | | |  |                                |  |  | |
+	// | | |  |                   domain <- 0000  |  | |
+	// | | |  |                                   |  | |
+	// en| |  |  --> ethernet                     |  | |
+	// | |  |                                   |  | |
+	// p4|  |  --> prefix/bus number (4)   <-- 04  | |
+	// |  |                                      | |
+	// s10|  --> slot/device number (10) <--    10 |
+	// |                                        |
+	// f1 --> function number (1)     <--       1
+
 	cl := colors.Scheme("dim-icon")
 	disp := pango.Textf("via %s", intf)
 	return outputs.Pango(disp).Color(cl)

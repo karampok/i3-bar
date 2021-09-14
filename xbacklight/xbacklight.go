@@ -20,7 +20,7 @@ type Module struct {
 }
 
 func (*Module) get() int {
-	b, err := exec.Command("xbacklight", "-get").CombinedOutput()
+	b, err := exec.Command("light", "-G").CombinedOutput()
 	if err != nil {
 		return -10
 	}
@@ -61,7 +61,7 @@ func (m *Module) Stream(s bar.Sink) {
 		case <-changes:
 			value = m.level.Get().(int)
 			if value == 0 {
-				exec.Command("xbacklight", "-set", "0.1").Run()
+				exec.Command("light", "-S", "1").Run()
 			}
 		case <-m.scheduler.C:
 			m.level.Set(m.get())
@@ -72,9 +72,9 @@ func (m *Module) Stream(s bar.Sink) {
 func (m *Module) click(e bar.Event) {
 	switch e.Button {
 	case bar.ButtonLeft, bar.ScrollDown, bar.ScrollLeft, bar.ButtonBack:
-		exec.Command("xbacklight", "-dec", "1").Run()
+		exec.Command("light", "-U", "1").Run()
 	case bar.ButtonRight, bar.ScrollUp, bar.ScrollRight, bar.ButtonForward:
-		exec.Command("xbacklight", "-inc", "1").Run()
+		exec.Command("light", "-A", "1").Run()
 	}
 	m.level.Set(m.get())
 }
