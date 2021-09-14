@@ -4,49 +4,56 @@ import (
 	"fmt"
 	"strings"
 
+	"barista.run/bar"
 	"barista.run/colors"
+	"barista.run/outputs"
 	"barista.run/pango"
-	"barista.run/pango/icons"
 )
+
+// PulseAudio ...
+func PulseAudio(intf string) bar.Output {
+	out := new(outputs.SegmentGroup)
+	i, o := parsePulsemixer(intf)
+	out.Append(i.Output())
+	out.Append(o.Output())
+	return out
+}
 
 var aliases = map[string]string{
 	"HD Pro Webcam C920 Pro":                              "C920Pa",
-	"Comet Lake PCH-LP cAVS Speaker + Headphones":         "internal",
-	"Comet Lake PCH-LP cAVS Digital Microphone":           "internal",
+	"Comet Lake PCH-LP cAVS Speaker + Headphones":         " ",
+	"Comet Lake PCH-LP cAVS Digital Microphone":           " ",
 	"Comet Lake PCH-LP cAVS Headphones Stereo Microphone": "jack",
 	"HD Pro Webcam C920 Analog Stereo":                    "C920",
 }
 
 type device struct {
-	// kind string // source/sink
+	kind         string // source/sink
 	name, alias  string
 	mute, dfault bool
 	volume       string
 }
 
-func (d *device) PangoNode() *pango.Node {
-	material := icons.NewProvider("material")
-	material.Font("Material Icons")
-	material.AddStyle(func(n *pango.Node) { n.UltraLight().Rise(-4000) })
-	err := material.Hex("today", "e855")
-	if err != nil {
-		panic(err)
-	}
-
-	ic := pango.Icon("material-today")
-	out := new(pango.Node)
-	name := d.name
+func (d *device) Output() *bar.Segment {
+	ic := pango.Icon("material-volume-up")
 	cl := colors.Scheme("dim-icon")
+	name := d.name
 
 	if d.alias != "" {
 		name = d.alias
 	}
 
-	if d.mute {
-		cl = colors.Scheme("bad")
+	if d.kind == "input" && d.mute {
+		ic = pango.Icon("material-mic-off")
+		return outputs.Pango(ic, name).Color(cl)
 	}
-	txt := fmt.Sprintf("%s - %s", name, d.volume)
-	out.Concat(ic).ConcatText(txt).Color(cl)
+	if d.kind == "input" && !d.mute {
+		ic = pango.Icon("material-mic")
+		return outputs.Pango(ic, name)
+	}
+
+	txt := fmt.Sprintf("%s %s", name, d.volume)
+	out := outputs.Pango(ic, txt).Color(cl)
 	return out
 }
 
@@ -92,8 +99,10 @@ func parsePulsemixer(in string) (input *device, output *device) {
 		x.volume = vols[1] // TODO: do regex!
 		switch kind {
 		case "Sink":
+			x.kind = "output"
 			output = x
 		case "Source":
+			x.kind = "input"
 			input = x
 		}
 	}

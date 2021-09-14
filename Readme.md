@@ -39,3 +39,7 @@ ln -s $PWD/material-design-icons/font/MaterialIcons-Regular.ttf ~/.fonts/
 fc-cache -fv
 ```
 
+
+
+# Similar
+https://github.com/greshake/i3status-rust

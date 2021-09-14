@@ -13,14 +13,10 @@ import (
 	"barista.run/pango"
 )
 
+// GCal ...
 func GCal(evts calendar.EventList) bar.Output {
 	ic := pango.Icon("material-today")
-	out := new(pango.Node).Concat(ic).Concat(spacer)
-
-	//cec := colors.Scheme("bad")
-	aec := colors.Scheme("degraded")
-	uec := colors.Scheme("dim-icon")
-	space := pango.Text("  /  ").Color(aec)
+	out := new(outputs.SegmentGroup).Append(ic)
 
 	if outsideWorkingHours(time.Now()) {
 		return nil
@@ -46,18 +42,30 @@ func GCal(evts calendar.EventList) bar.Output {
 	}
 
 	// TODO: allow only 3 events.
-	// TODO: spacer to have black background.
+	if len(evts.InProgress) > 0 || len(evts.Alerting) > 0 {
+		focusTime = true
+	} else {
+		focusTime = false
+	}
+
 	for _, evt := range evts.InProgress {
 		txt := output(evt, fmt.Sprintf("until %v", evt.End.Format("15:04")))
-		out.ConcatText(txt).Color(colors.Scheme("white")).Background(colors.Scheme("black")).Concat(space)
+		f := func(bar.Event) {
+			// how to hide it?
+		}
+		s := new(outputs.SegmentGroup).Append(pango.Text(txt).Medium()).
+			Color(colors.Scheme("black")).Background(colors.Scheme("white")).OnClick(f)
+		out.Append(s)
 	}
 	for _, evt := range evts.Alerting {
 		txt := output(evt, fmt.Sprintf("@ %v", evt.Start.Format("15:04")))
-		out.ConcatText(txt).Append(space).Color(aec)
+		s := outputs.Pango(txt)
+		out.Append(s)
 	}
 	for _, evt := range evts.Upcoming {
 		txt := output(evt, fmt.Sprintf("@ %v", evt.Start.Format("15:04")))
-		out.ConcatText(txt).Concat(space).Color(uec)
+		s := outputs.Pango(txt).Color(colors.Scheme("dim-icon"))
+		out.Append(s)
 	}
 
 	return outputs.Repeat(func(time.Time) bar.Output {
@@ -65,21 +73,17 @@ func GCal(evts calendar.EventList) bar.Output {
 	}).Every(time.Minute)
 }
 
+// GMail ...
 func GMail(n gmail.Info) bar.Output {
-	cl := colors.Scheme("dim-icon")
-	ic := pango.Icon("material-email")
-
 	if outsideWorkingHours(time.Now()) {
 		return nil
 	}
 
 	v := n.Unread["INBOX"]
-	ret := outputs.Pango(spacer, ic, v, spacer).Color(cl)
 	if v > 0 {
-		return ret.Color(colors.Scheme("white")).Background(colors.Scheme("black"))
+		return pango.Icon("material-mail")
 	}
-	return ret
-
+	return nil
 }
 
 func outsideWorkingHours(t time.Time) bool {
