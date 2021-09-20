@@ -16,7 +16,7 @@ import (
 // GCal ...
 func GCal(evts calendar.EventList) bar.Output {
 	ic := pango.Icon("material-today")
-	out := new(outputs.SegmentGroup).Append(ic)
+	out := new(outputs.SegmentGroup)
 
 	if outsideWorkingHours(time.Now()) {
 		return nil
@@ -59,18 +59,28 @@ func GCal(evts calendar.EventList) bar.Output {
 	}
 	for _, evt := range evts.Alerting {
 		txt := output(evt, fmt.Sprintf("@ %v", evt.Start.Format("15:04")))
-		s := outputs.Pango(txt)
+		s := outputs.Pango(ic, txt)
 		out.Append(s)
 	}
 	for _, evt := range evts.Upcoming {
+		if ignorePersonal(evt.Summary) {
+			continue
+		}
 		txt := output(evt, fmt.Sprintf("@ %v", evt.Start.Format("15:04")))
-		s := outputs.Pango(txt).Color(colors.Scheme("dim-icon"))
+		s := outputs.Pango(ic, txt).Color(colors.Scheme("dim-icon"))
 		out.Append(s)
 	}
 
 	return outputs.Repeat(func(time.Time) bar.Output {
 		return out
 	}).Every(time.Minute)
+}
+
+func ignorePersonal(n string) bool {
+	if strings.Contains(n, "AFK") || strings.Contains(n, "EOD") {
+		return true
+	}
+	return false
 }
 
 // GMail ...

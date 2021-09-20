@@ -2,6 +2,7 @@ package blocks
 
 import (
 	"fmt"
+	"os/exec"
 	"strings"
 
 	"barista.run/bar"
@@ -28,10 +29,10 @@ var aliases = map[string]string{
 }
 
 type device struct {
-	kind         string // source/sink
-	name, alias  string
-	mute, dfault bool
-	volume       string
+	kind            string // source/sink
+	name, id, alias string
+	mute, dfault    bool
+	volume          string
 }
 
 func (d *device) Output() *bar.Segment {
@@ -43,17 +44,42 @@ func (d *device) Output() *bar.Segment {
 		name = d.alias
 	}
 
+	toggleMuteMic := func(bar.Event) {
+		exec.Command("pulsemixer", "--toggle-mute", "--id", d.id).CombinedOutput()
+		v, _ := exec.Command("pulsemixer", "--get-mute", "--id", d.id).CombinedOutput()
+		if string(v) == "1\n" {
+			exec.Command("light", "-s", "sysfs/leds/platform::micmute", "-S", "100").CombinedOutput()
+			return
+		}
+		exec.Command("light", "-s", "sysfs/leds/platform::micmute", "-S", "0").CombinedOutput()
+	}
+
 	if d.kind == "input" && d.mute {
 		ic = pango.Icon("material-mic-off")
-		return outputs.Pango(ic, name).Color(cl)
+		return outputs.Pango(ic, name).Color(cl).OnClick(toggleMuteMic)
 	}
+
 	if d.kind == "input" && !d.mute {
 		ic = pango.Icon("material-mic")
-		return outputs.Pango(ic, name)
+		return outputs.Pango(ic, name).OnClick(toggleMuteMic)
 	}
 
 	txt := fmt.Sprintf("%s %s", name, d.volume)
-	out := outputs.Pango(ic, txt).Color(cl)
+	toggleMute := func(bar.Event) {
+		exec.Command("pulsemixer", "--toggle-mute", "--id", d.id).CombinedOutput()
+		v, _ := exec.Command("pulsemixer", "--get-mute", "--id", d.id).CombinedOutput()
+		if string(v) == "1\n" {
+			exec.Command("light", "-s", "sysfs/leds/platform::mute", "-S", "100").CombinedOutput()
+			return
+		}
+		exec.Command("light", "-s", "sysfs/leds/platform::mute", "-S", "0").CombinedOutput()
+	}
+	if d.kind == "output" && d.mute {
+		ic = pango.Icon("material-volume-off")
+		return outputs.Pango(ic, txt).OnClick(toggleMute)
+
+	}
+	out := outputs.Pango(ic, txt).Color(cl).OnClick(toggleMute)
 	return out
 }
 
@@ -86,6 +112,9 @@ func parsePulsemixer(in string) (input *device, output *device) {
 		//[Channels]: 2,
 		//[Volumes]: ['69%', '69%']
 
+		if v, ok := m["ID"]; ok {
+			x.id = v
+		}
 		if v, ok := m["Name"]; ok {
 			x.name = v
 		}

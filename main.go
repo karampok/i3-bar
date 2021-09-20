@@ -52,6 +52,8 @@ func main() {
 	barista.Add(lly)
 	audio := shell.New("bash", "-c", "pulsemixer --list").Output(blocks.PulseAudio).Every(time.Second)
 	barista.Add(audio)
+	spotify := media.New("spotify").Output(blocks.Media)
+	barista.Add(spotify)
 	br := xbacklight.New().Output(blocks.Brightness)
 	barista.Add(br)
 	bat := battery.All().Output(blocks.Bat)
@@ -83,8 +85,6 @@ func main() {
 	ti := clock.Local().Output(time.Second, blocks.Clock)
 	barista.Add(ti)
 
-	spotify := media.New("spotify").Output(blocks.Media)
-	barista.Add(spotify)
 
 	panic(barista.Run())
 }

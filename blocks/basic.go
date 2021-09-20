@@ -69,10 +69,14 @@ func Bat(i battery.Info) bar.Output {
 		return outputs.Textf("%v", i.Status).Urgent(true)
 	}
 
-	txt := fmt.Sprintf("%d%% %s", i.RemainingPct(), i.Status)
-	if i.Power > 8.0 {
+	txt := ""
+	if i.RemainingPct() < 90 {
+		txt = fmt.Sprintf("%d%%", i.RemainingPct())
+	}
+	if i.Power > 8.0 && i.Status == battery.Discharging {
 		txt += fmt.Sprintf("(%2.1f Watt)", i.Power)
 	}
+
 	disp := pango.Text(txt)
 	iconName := "material-battery-full"
 	icon := pango.Icon(iconName).Color(colors.Scheme("dim-icon"))
