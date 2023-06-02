@@ -2,6 +2,7 @@ package blocks
 
 import (
 	"barista.run/bar"
+	"barista.run/colors"
 	"barista.run/modules/media"
 	"barista.run/outputs"
 	"barista.run/pango"
@@ -20,13 +21,14 @@ func Media(m media.Info) bar.Output {
 		return nil
 	}
 
+	cl := colors.Scheme("dim-icon")
+	ic := pango.Icon("material-music-note")
+
 	out := new(outputs.SegmentGroup)
 	if m.Playing() {
-		ic := pango.Icon("material-play-arrow")
 		out.Append(ic).OnClick(ifLeft(m.Pause))
 	} else {
-		ic := pango.Icon("material-pause")
-		out.Append(ic).OnClick(ifLeft(m.Play))
+		out.Append(ic).OnClick(ifLeft(m.Play)).Color(cl)
 	}
 	//	out.Append(outputs.Text(">|").OnClick(ifLeft(m.Next)))
 	return out

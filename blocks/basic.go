@@ -73,7 +73,7 @@ func Bat(i battery.Info) bar.Output {
 	if i.RemainingPct() < 90 {
 		txt = fmt.Sprintf("%d%%", i.RemainingPct())
 	}
-	if i.Power > 8.0 && i.Status == battery.Discharging {
+	if i.Power > 3.0 && i.Status == battery.Discharging {
 		txt += fmt.Sprintf("(%2.1f Watt)", i.Power)
 	}
 
@@ -133,7 +133,7 @@ func Brightness(i int) bar.Output {
 func Layout(m *kbdlayout.Module, i kbdlayout.Info) bar.Output {
 	ic := pango.Icon("material-language")
 	if la := strings.ToLower(i.Layout); la != "us" {
-		return outputs.Pango(ic, fmt.Sprintf("%s", la)).OnClick(m.Click)
+		return outputs.Pango(ic, fmt.Sprintf("%s", la)).Color(colors.Scheme("bad")).OnClick(m.Click)
 	}
 	return nil
 }

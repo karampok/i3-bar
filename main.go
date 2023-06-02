@@ -2,10 +2,10 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os/exec"
 	"time"
 
+	"net/http"
 	_ "net/http/pprof"
 
 	"barista.run"
@@ -38,7 +38,7 @@ func main() {
 	//GSuite stuff
 	var cl, gm bar.Module
 	if out, err := setupGSuiteCreds(); err == nil {
-		cl = calendar.New(out).Output(blocks.GCal).TimeWindow(8 * time.Hour)
+		cl = calendar.New(out).Output(blocks.GCal).TimeWindow(4 * time.Hour)
 		gm = gmail.New(out, "INBOX").Output(blocks.GMail)
 	} else {
 		cl = module.NewDummyModule("calendar error")
@@ -50,14 +50,14 @@ func main() {
 	//System stuff
 	lly := kbdlayout.New().Output(blocks.Layout) // TODO: get one that does not crash on setup-auth
 	barista.Add(lly)
-	audio := shell.New("bash", "-c", "pulsemixer --list").Output(blocks.PulseAudio).Every(time.Second)
-	barista.Add(audio)
 	spotify := media.New("spotify").Output(blocks.Media)
 	barista.Add(spotify)
 	br := xbacklight.New().Output(blocks.Brightness)
 	barista.Add(br)
 	bat := battery.All().Output(blocks.Bat)
 	barista.Add(bat)
+	audio := shell.New("bash", "-c", "pulsemixer --list").Output(blocks.PulseAudio).Every(time.Second)
+	barista.Add(audio)
 
 	//Bluetooth stuff
 	qc35, qc25mac, _ := "hci0", "4C:87:5D:58:8B:C2", "bluez_sink.4C_87_5D_58_8B_C2.headset_head_unit"
@@ -81,10 +81,11 @@ func main() {
 	barista.Add(tvpn)
 	rvpn := netinfo.Interface("tun0").Output(blocks.PerVPN("RH"))
 	barista.Add(rvpn)
+	bvpn := netinfo.Interface("vpn0").Output(blocks.PerVPN("B"))
+	barista.Add(bvpn)
 
 	ti := clock.Local().Output(time.Second, blocks.Clock)
 	barista.Add(ti)
-
 
 	panic(barista.Run())
 }

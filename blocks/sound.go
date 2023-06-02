@@ -21,11 +21,14 @@ func PulseAudio(intf string) bar.Output {
 }
 
 var aliases = map[string]string{
-	"HD Pro Webcam C920 Pro":                              "C920Pa",
-	"Comet Lake PCH-LP cAVS Speaker + Headphones":         " ",
-	"Comet Lake PCH-LP cAVS Digital Microphone":           " ",
-	"Comet Lake PCH-LP cAVS Headphones Stereo Microphone": "jack",
-	"HD Pro Webcam C920 Analog Stereo":                    "C920",
+	"HD Pro Webcam C920 Pro":                                        "C920Pa",
+	"Comet Lake PCH-LP cAVS Speaker + Headphones":                   "jack",
+	"ThinkPad Thunderbolt 3 Dock USB Audio Digital Stereo (IEC958)": "dock",
+	"ThinkPad Thunderbolt 3 Dock USB Audio Mono":                    "dock",
+	"Comet Lake PCH-LP cAVS Digital Microphone":                     "-",
+	"Comet Lake PCH-LP cAVS Headphones Stereo Microphone":           "jack",
+	"Jabra Elite 75t":                  "j75t",
+	"HD Pro Webcam C920 Analog Stereo": "C920",
 }
 
 type device struct {
@@ -38,8 +41,8 @@ type device struct {
 func (d *device) Output() *bar.Segment {
 	ic := pango.Icon("material-volume-up")
 	cl := colors.Scheme("dim-icon")
-	name := d.name
 
+	name := d.name
 	if d.alias != "" {
 		name = d.alias
 	}
@@ -76,8 +79,10 @@ func (d *device) Output() *bar.Segment {
 	}
 	if d.kind == "output" && d.mute {
 		ic = pango.Icon("material-volume-off")
+		if d.mute {
+			ic = pango.Icon("material-volume-off")
+		}
 		return outputs.Pango(ic, txt).OnClick(toggleMute)
-
 	}
 	out := outputs.Pango(ic, txt).Color(cl).OnClick(toggleMute)
 	return out

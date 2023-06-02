@@ -42,6 +42,7 @@ func GCal(evts calendar.EventList) bar.Output {
 	}
 
 	// TODO: allow only 3 events.
+	total := 0
 	if len(evts.InProgress) > 0 || len(evts.Alerting) > 0 {
 		focusTime = true
 	} else {
@@ -49,7 +50,8 @@ func GCal(evts calendar.EventList) bar.Output {
 	}
 
 	for _, evt := range evts.InProgress {
-		txt := output(evt, fmt.Sprintf("until %v", evt.End.Format("15:04")))
+		total++
+		txt := output(evt, fmt.Sprintf(" until %v", evt.End.Format("15:04")))
 		f := func(bar.Event) {
 			// how to hide it?
 		}
@@ -58,11 +60,19 @@ func GCal(evts calendar.EventList) bar.Output {
 		out.Append(s)
 	}
 	for _, evt := range evts.Alerting {
-		txt := output(evt, fmt.Sprintf("@ %v", evt.Start.Format("15:04")))
+		total++
+		if total > 2 {
+			continue
+		}
+		txt := output(evt, fmt.Sprintf("at %v", evt.Start.Format("15:04")))
 		s := outputs.Pango(ic, txt)
 		out.Append(s)
 	}
 	for _, evt := range evts.Upcoming {
+		total++
+		if total > 2 {
+			continue
+		}
 		if ignorePersonal(evt.Summary) {
 			continue
 		}
@@ -91,7 +101,8 @@ func GMail(n gmail.Info) bar.Output {
 
 	v := n.Unread["INBOX"]
 	if v > 0 {
-		return pango.Icon("material-mail")
+		ic := pango.Icon("material-mail")
+		return outputs.Pango("rh", ic)
 	}
 	return nil
 }
