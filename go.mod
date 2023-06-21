@@ -1,22 +1,59 @@
 module github.com/karampok/i3-bar
 
-go 1.14
+go 1.20
 
 require (
-	barista.run v0.0.0-20220428171654-ed2009f9f914
-	github.com/glebtv/custom_barista v0.0.0-20220227230748-18179e6a8316
-	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
-	github.com/jfreymuth/pulse v0.1.0 // indirect
-	github.com/martinohmann/barista-contrib v0.0.0-20200512173359-33be425ccfe9
-	github.com/maximbaz/yubikey-touch-detector v0.0.0-20200421201032-8fba75527a0c
-	github.com/sirupsen/logrus v1.5.0 // indirect
-	github.com/stretchr/testify v1.7.1
-	github.com/vishvananda/netns v0.0.0-20211101163701-50045581ed74 // indirect
-	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
-	golang.org/x/net v0.0.0-20220526153639-5463443f8c37 // indirect
-	golang.org/x/oauth2 v0.0.0-20220524215830-622c5d57e401 // indirect
-	golang.org/x/time v0.0.0-20220411224347-583f2d630306 // indirect
-	google.golang.org/api v0.81.0 // indirect
-	google.golang.org/genproto v0.0.0-20220527130721-00d5c0f3be58 // indirect
-	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
+	barista.run v0.0.0-20230524172157-ae0838cc285a
+	github.com/glebtv/custom_barista v0.0.0-20220805154625-21b5dc8fae7e
+	github.com/lawl/pulseaudio v0.0.0-20220626105240-976bed5e247c
+	github.com/martinohmann/barista-contrib v0.0.0-20230324194946-e5c115e49dc3
+	github.com/maximbaz/yubikey-touch-detector v0.0.0-20230226195601-89641421bc8a
+	github.com/stretchr/testify v1.8.3
+	gotest.tools v2.2.0+incompatible
 )
+
+require (
+	cloud.google.com/go/compute v1.20.0 // indirect
+	cloud.google.com/go/compute/metadata v0.2.3 // indirect
+	github.com/BurntSushi/xgb v0.0.0-20210121224620-deaf085860bc // indirect
+	github.com/BurntSushi/xgbutil v0.0.0-20190907113008-ad855c713046 // indirect
+	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
+	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/esiqveland/notify v0.11.2 // indirect
+	github.com/fsnotify/fsnotify v1.6.0 // indirect
+	github.com/godbus/dbus/v5 v5.1.0 // indirect
+	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
+	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/google/s2a-go v0.1.4 // indirect
+	github.com/google/uuid v1.3.0 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
+	github.com/googleapis/gax-go/v2 v2.10.0 // indirect
+	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
+	github.com/martinlindhe/unit v0.0.0-20230420213220-4adfd7d0a0d6 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/rjeczalik/notify v0.9.3 // indirect
+	github.com/scylladb/go-set v1.0.2 // indirect
+	github.com/sirupsen/logrus v1.9.2 // indirect
+	github.com/spf13/afero v1.9.5 // indirect
+	github.com/vishvananda/netlink v1.1.0 // indirect
+	github.com/vishvananda/netns v0.0.4 // indirect
+	github.com/vtolstov/go-ioctl v0.0.0-20151206205506-6be9cced4810 // indirect
+	go.opencensus.io v0.24.0 // indirect
+	golang.org/x/crypto v0.9.0 // indirect
+	golang.org/x/net v0.10.0 // indirect
+	golang.org/x/oauth2 v0.8.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
+	golang.org/x/text v0.9.0 // indirect
+	golang.org/x/time v0.3.0 // indirect
+	google.golang.org/api v0.125.0 // indirect
+	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
+	google.golang.org/grpc v1.55.0 // indirect
+	google.golang.org/protobuf v1.30.0 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
+
+replace github.com/lawl/pulseaudio => /home/kka/gohack/github.com/lawl/pulseaudio

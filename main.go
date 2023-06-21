@@ -1,11 +1,9 @@
 package main
 
 import (
-	"log"
 	"os/exec"
 	"time"
 
-	"net/http"
 	_ "net/http/pprof"
 
 	"barista.run"
@@ -14,7 +12,6 @@ import (
 	"barista.run/modules/bluetooth"
 	"barista.run/modules/clock"
 	"barista.run/modules/gsuite/calendar"
-	"barista.run/modules/gsuite/gmail"
 	"barista.run/modules/media"
 	"barista.run/modules/netinfo"
 	"barista.run/modules/shell"
@@ -26,53 +23,50 @@ import (
 	"github.com/karampok/i3-bar/xbacklight"
 
 	"github.com/glebtv/custom_barista/kbdlayout"
-	"github.com/martinohmann/barista-contrib/modules/ip"
-	"github.com/martinohmann/barista-contrib/modules/ip/ipify"
 )
 
 func main() {
-	go func() {
-		log.Println(http.ListenAndServe("localhost:6060", nil))
-	}()
+	//	go func() {
+	//		log.Println(http.ListenAndServe("localhost:6060", nil))
+	//	}()
 
 	//GSuite stuff
-	var cl, gm bar.Module
+	var cl bar.Module
 	if out, err := setupGSuiteCreds(); err == nil {
 		cl = calendar.New(out).Output(blocks.GCal).TimeWindow(4 * time.Hour)
-		gm = gmail.New(out, "INBOX").Output(blocks.GMail)
+		//		gm = gmail.New(out, "INBOX").Output(blocks.GMail)
 	} else {
 		cl = module.NewDummyModule("calendar error")
-		gm = module.NewDummyModule("gmail error")
+		//		gm = module.NewDummyModule("gmail error")
 	}
 	barista.Add(cl)
-	barista.Add(gm)
 
 	//System stuff
 	lly := kbdlayout.New().Output(blocks.Layout) // TODO: get one that does not crash on setup-auth
 	barista.Add(lly)
-	spotify := media.New("spotify").Output(blocks.Media)
-	barista.Add(spotify)
 	br := xbacklight.New().Output(blocks.Brightness)
 	barista.Add(br)
 	bat := battery.All().Output(blocks.Bat)
 	barista.Add(bat)
-	audio := shell.New("bash", "-c", "pulsemixer --list").Output(blocks.PulseAudio).Every(time.Second)
-	barista.Add(audio)
-
+	//audio := shell.New("bash", "-c", "pulsemixer --list").Output(blocks.PulseAudio).Every(time.Second)
+	//	barista.Add(audio)
 	//Bluetooth stuff
 	qc35, qc25mac, _ := "hci0", "4C:87:5D:58:8B:C2", "bluez_sink.4C_87_5D_58_8B_C2.headset_head_unit"
 	jabra75t5, jabra75mac, _ := "hci0", "70:BF:92:B2:95:E9", "bluez_sink.70_BF_92_B2_95_E9.headset_head_unit"
+	glbud, glbudmac, _ := "hci0", "24:29:34:A0:CD:99", "bluez_sink.24_29_34_A0_CD_99.headset_head_unit"
 	blDq := bluetooth.Device(qc35, qc25mac).Output(blocks.PerBlueDevice("QC35"))
 	barista.Add(blDq)
 	blDj := bluetooth.Device(jabra75t5, jabra75mac).Output(blocks.PerBlueDevice("j75t"))
 	barista.Add(blDj)
-	bl := bluetooth.DefaultAdapter().Output(blocks.Bluetooth)
-	barista.Add(bl)
+	blDg := bluetooth.Device(glbud, glbudmac).Output(blocks.PerBlueDevice("gB"))
+	barista.Add(blDg)
+	// bl := bluetooth.DefaultAdapter().Output(blocks.Bluetooth)
+	// barista.Add(bl)
 
 	//Net stuff
-	online := ip.New(ipify.Provider).Output(blocks.Online).Every(time.Minute)
-	barista.Add(online)
-	via := shell.New("bash", "-c", "ip route get 8.8.8.8 | grep -Po '(?<=dev )(\\S+)'").
+	//online := ip.New(ipify.Provider).Output(blocks.Online).Every(time.Minute)
+	//barista.Add(online)
+	via := shell.New("bash", "-c", "ip -json route get 8.8.8.8  |jq -r .[0].dev").
 		Output(blocks.ViaInterface).Every(time.Minute)
 	barista.Add(via)
 	wifi := wlan.Named("wlp0s20f3").Output(blocks.WLAN)
@@ -86,6 +80,9 @@ func main() {
 
 	ti := clock.Local().Output(time.Second, blocks.Clock)
 	barista.Add(ti)
+
+	spotify := media.New("spotify").Output(blocks.Media)
+	barista.Add(spotify)
 
 	panic(barista.Run())
 }
