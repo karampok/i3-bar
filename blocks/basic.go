@@ -134,6 +134,8 @@ func Layout(m *kbdlayout.Module, i kbdlayout.Info) bar.Output {
 	ic := pango.Icon("material-language")
 	if la := strings.ToLower(i.Layout); la != "us" {
 		return outputs.Pango(ic, fmt.Sprintf("%s", la)).Color(colors.Scheme("bad")).OnClick(m.Click)
+	} else {
+		return outputs.Pango(ic, fmt.Sprintf("%s", la)).Color(colors.Scheme("dim-icon")).OnClick(m.Click)
 	}
 	return nil
 }

@@ -3,17 +3,17 @@ module github.com/karampok/i3-bar
 go 1.20
 
 require (
-	barista.run v0.0.0-20230524172157-ae0838cc285a
+	barista.run v0.0.0-20231219000430-3a000dfe4445
 	github.com/glebtv/custom_barista v0.0.0-20220805154625-21b5dc8fae7e
+	github.com/google/go-cmp v0.6.0
 	github.com/lawl/pulseaudio v0.0.0-20220626105240-976bed5e247c
 	github.com/martinohmann/barista-contrib v0.0.0-20230324194946-e5c115e49dc3
-	github.com/maximbaz/yubikey-touch-detector v0.0.0-20230226195601-89641421bc8a
-	github.com/stretchr/testify v1.8.3
-	gotest.tools v2.2.0+incompatible
+	github.com/maximbaz/yubikey-touch-detector v0.0.0-20231219131651-ce2874a7a89d
+	github.com/stretchr/testify v1.8.4
 )
 
 require (
-	cloud.google.com/go/compute v1.20.0 // indirect
+	cloud.google.com/go/compute v1.23.3 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	github.com/BurntSushi/xgb v0.0.0-20210121224620-deaf085860bc // indirect
 	github.com/BurntSushi/xgbutil v0.0.0-20190907113008-ad855c713046 // indirect
@@ -21,38 +21,43 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/esiqveland/notify v0.11.2 // indirect
-	github.com/fsnotify/fsnotify v1.6.0 // indirect
+	github.com/felixge/httpsnoop v1.0.4 // indirect
+	github.com/fsnotify/fsnotify v1.7.0 // indirect
+	github.com/go-logr/logr v1.4.1 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/go-cmp v0.5.9 // indirect
-	github.com/google/s2a-go v0.1.4 // indirect
-	github.com/google/uuid v1.3.0 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.2.3 // indirect
-	github.com/googleapis/gax-go/v2 v2.10.0 // indirect
+	github.com/google/s2a-go v0.1.7 // indirect
+	github.com/google/uuid v1.5.0 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
+	github.com/googleapis/gax-go/v2 v2.12.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/martinlindhe/unit v0.0.0-20230420213220-4adfd7d0a0d6 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rjeczalik/notify v0.9.3 // indirect
 	github.com/scylladb/go-set v1.0.2 // indirect
-	github.com/sirupsen/logrus v1.9.2 // indirect
-	github.com/spf13/afero v1.9.5 // indirect
+	github.com/sirupsen/logrus v1.9.3 // indirect
+	github.com/spf13/afero v1.11.0 // indirect
 	github.com/vishvananda/netlink v1.1.0 // indirect
 	github.com/vishvananda/netns v0.0.4 // indirect
 	github.com/vtolstov/go-ioctl v0.0.0-20151206205506-6be9cced4810 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	golang.org/x/crypto v0.9.0 // indirect
-	golang.org/x/net v0.10.0 // indirect
-	golang.org/x/oauth2 v0.8.0 // indirect
-	golang.org/x/sys v0.8.0 // indirect
-	golang.org/x/text v0.9.0 // indirect
-	golang.org/x/time v0.3.0 // indirect
-	google.golang.org/api v0.125.0 // indirect
-	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20230530153820-e85fd2cbaebc // indirect
-	google.golang.org/grpc v1.55.0 // indirect
-	google.golang.org/protobuf v1.30.0 // indirect
+	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.46.1 // indirect
+	go.opentelemetry.io/otel v1.21.0 // indirect
+	go.opentelemetry.io/otel/metric v1.21.0 // indirect
+	go.opentelemetry.io/otel/trace v1.21.0 // indirect
+	golang.org/x/crypto v0.17.0 // indirect
+	golang.org/x/net v0.19.0 // indirect
+	golang.org/x/oauth2 v0.15.0 // indirect
+	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/time v0.5.0 // indirect
+	google.golang.org/api v0.154.0 // indirect
+	google.golang.org/appengine v1.6.8 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20231212172506-995d672761c0 // indirect
+	google.golang.org/grpc v1.60.1 // indirect
+	google.golang.org/protobuf v1.32.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
